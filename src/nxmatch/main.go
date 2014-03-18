@@ -2,11 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"time"
-	"log"
-	"fmt"
 )
 
 type Team struct {
@@ -60,7 +60,9 @@ func NewMatch(l, v Team, time time.Time, where string) *Match {
 	return m
 }
 func NewResult(h string, hs int, v string, vs int, when string, where string) *Match {
+
 	time, e := time.Parse("Monday, January 02 2006, 03:04 PM MST", when)
+
 	if e != nil {
 		log.Print(e.Error())
 	}
@@ -76,13 +78,13 @@ func (s Score) String() string {
 }
 
 func main() {
-
 	log.Println("Serving...")
 	http.HandleFunc("/list", handler)
 	http.ListenAndServe(":6060", nil)
 }
+
 func handler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Serving %s to: %s",  r.RequestURI, r.RemoteAddr)
+	log.Printf("Serving %s to: %s", r.RequestURI, r.RemoteAddr)
 	results := []*Match{
 		NewResult("BobCats", 101, "Bucks", 92, "Sunday, March 16 2014, 12:00 PM CST", "BMO Harris Bradley Center, Milwaukee, Wisconsin"),
 		NewResult("Rockets", 104, "Heat", 103, "Sunday, March 16 2014, 02:30 PM CST", "AmericanAirlines Arena, Miami, Florida"),
@@ -94,7 +96,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := json.Marshal(results)
 
-	t, err := template.ParseFiles("webapp/src/templates/list.html")
+	t, err := template.ParseFiles("src/templates/list.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
