@@ -1,7 +1,7 @@
 _"When is the next match?"_
 ======
 
-That's the question to answer, this is the main repositoriy for the NxMatch website that will satisfy that need for information. 
+That's the question to answer, this is the main repository for the NxMatch website that will satisfy that need for information.
 
 There is not much just yet, bt we'll be changing that. 
 
