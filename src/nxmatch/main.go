@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"net/http"
 	"time"
+	"log"
+	"fmt"
 )
 
 type Team struct {
@@ -22,8 +23,8 @@ type League struct {
 	teams []Team
 }
 type Score struct {
-	LocalScore, VisitorScore int
-	Local, Visitor           Team
+	HomeScore, VisitorScore int
+	Home, Visitor           Team
 }
 
 type Match struct {
@@ -35,15 +36,15 @@ type Season struct {
 	matches []Match
 }
 
-func (s Score) AddPoints(ls, vs int) Score {
-	return Score{Local: s.Local, Visitor: s.Visitor, LocalScore: ls, VisitorScore: vs}
+func (s Score) AddPoints(hs, vs int) Score {
+	return Score{Home: s.Home, Visitor: s.Visitor, HomeScore: hs, VisitorScore: vs}
 }
 func (m *Match) Add(s Score) {
 	m.Scores = append(m.Scores, s)
 }
-func (m *Match) AddScore(ls, vs int) {
+func (m *Match) AddScore(hs, vs int) {
 	s := m.Scores[0]
-	m.Scores = append(m.Scores, s.AddPoints(ls, vs))
+	m.Scores = append(m.Scores, s.AddPoints(hs, vs))
 
 }
 
@@ -54,33 +55,34 @@ func NewMatch(l, v Team, time time.Time, where string) *Match {
 		Location: where,
 	}
 
-	m.Add(Score{Local: l, Visitor: v})
+	m.Add(Score{Home: l, Visitor: v})
 
 	return m
 }
-func NewResult(l string, ls int, v string, vs int, when string, where string) *Match {
+func NewResult(h string, hs int, v string, vs int, when string, where string) *Match {
 	time, e := time.Parse("Monday, January 02 2006, 03:04 PM MST", when)
 	if e != nil {
-		fmt.Print(e.Error())
+		log.Print(e.Error())
 	}
-	m := NewMatch(NewTeam(l), NewTeam(v), time, where)
-	m.AddScore(ls, vs)
+	m := NewMatch(NewTeam(h), NewTeam(v), time, where)
+	m.AddScore(hs, vs)
 	return m
 }
 func (m *Match) String() string {
 	return fmt.Sprintf("%s %s at %s", m.Scores[len(m.Scores)-1], m.Time, m.Location)
 }
 func (s Score) String() string {
-	return fmt.Sprintf("%s %d - %d %s", s.Local.Name, s.LocalScore, s.VisitorScore, s.Visitor.Name)
+	return fmt.Sprintf("%s %d - %d %s", s.Home.Name, s.HomeScore, s.VisitorScore, s.Visitor.Name)
 }
 
 func main() {
 
-	fmt.Println("Serving...")
+	log.Println("Serving...")
 	http.HandleFunc("/list", handler)
 	http.ListenAndServe(":6060", nil)
 }
 func handler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Serving %s to: %s",  r.RequestURI, r.RemoteAddr)
 	results := []*Match{
 		NewResult("BobCats", 101, "Bucks", 92, "Sunday, March 16 2014, 12:00 PM CST", "BMO Harris Bradley Center, Milwaukee, Wisconsin"),
 		NewResult("Rockets", 104, "Heat", 103, "Sunday, March 16 2014, 02:30 PM CST", "AmericanAirlines Arena, Miami, Florida"),
@@ -92,8 +94,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := json.Marshal(results)
 
-	fmt.Println(string(j))
-	t, err := template.ParseFiles("src/templates/results.html")
+	t, err := template.ParseFiles("webapp/src/templates/list.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

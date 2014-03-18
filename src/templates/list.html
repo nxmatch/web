@@ -1,0 +1,99 @@
+<html>
+<head>
+
+    <style>
+        .vk_txt {
+        font-size: small !important;
+        font-weight: lighter !important;
+        }
+        div {
+        display: block;
+        }
+        .vk_gy {
+        color: #878787 !important;
+        }
+        .vk_bk {
+        color: #212121 !important;
+        }
+        .lr_sns_ovo_hl_gn {
+        font-size: 20px;
+        }
+        li.g, body, html, .std, h1 {
+        font-size: small;
+        font-family: arial,sans-serif;
+        }
+        .lr_sns_ovo_hhp {
+        float: left;
+        text-align: left;
+
+        width: 40%;
+        }
+        .lr_sns_ovo_hl_v {
+        font-size: 20px;
+        text-align: center;
+        }
+        .lr_sns_ovo_hap {
+        float: right;
+        text-align: right;
+        width: 40%;
+        }
+        .lr_sns_ovo_md_hl {
+        margin-top: 20px;
+        font-size: 13px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="results" style="max-width:400px"/>
+<div id="match-template" class="match" data-mh="320px;" style="max-height: 320px;">
+    <div class="lrep_xpnd" style="max-height: 231px;">
+        <div class="lr_sns_ovo_md vk_gy">
+
+            <div class="vk_txt time"></div>
+            <div class="vk_txt location"></div>
+            <div class="lr_sns_ovo_md_hl vk_bk">
+                <div class="lr_sns_ovo_hhp">
+
+                    <div class="lr_sns_ovo_hl_gn home"></div>
+                    <div style="clear:both"></div>
+                </div>
+
+                <div class="lr_sns_ovo_hl_v score">
+                    <div></div>
+                </div>
+                <div class="lr_sns_ovo_hap">
+
+                    <div class="lr_sns_ovo_hl_gn visitor"></div>
+                    <div style="clear:both"></div>
+                </div>
+
+                <div style="clear:both"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="matches"></div>
+</body>
+<script>
+        var r = {{.}}
+        var d = document.getElementById("match-template");
+        var results = document.getElementById("results");
+
+        for ( var i = 0 ; i < r.length ; i++ ) {
+            var match = r[i];
+            var score = match.Scores[match.Scores.length-1];
+            var n = d.cloneNode(true);
+            n.querySelector(".time").innerHTML      = match.Time;
+            n.querySelector(".location").innerHTML  = match.Location;
+            n.querySelector(".home").innerHTML      = score.Home.Name;
+            n.querySelector(".visitor").innerHTML   = score.Visitor.Name;
+            n.querySelector(".score").innerHTML     = score.HomeScore + " - " + score.VisitorScore;
+            results.appendChild(n);
+        }
+
+</script>
+</html>
+
