@@ -22,30 +22,28 @@ type League struct {
 	name  string
 	teams []Team
 }
+
+type Season struct {
+	matches []Match
+}
+
 type Score struct {
 	HomeScore, VisitorScore int
 	Home, Visitor           Team
+}
+
+func (s Score) AddPoints(hs, vs int) Score {
+	return Score{Home: s.Home, Visitor: s.Visitor, HomeScore: hs, VisitorScore: vs}
+}
+
+func (s Score) String() string {
+	return fmt.Sprintf("%s %d - %d %s", s.Home.Name, s.HomeScore, s.VisitorScore, s.Visitor.Name)
 }
 
 type Match struct {
 	Time     time.Time
 	Scores   []Score
 	Location string
-}
-type Season struct {
-	matches []Match
-}
-
-func (s Score) AddPoints(hs, vs int) Score {
-	return Score{Home: s.Home, Visitor: s.Visitor, HomeScore: hs, VisitorScore: vs}
-}
-func (m *Match) Add(s Score) {
-	m.Scores = append(m.Scores, s)
-}
-func (m *Match) AddScore(hs, vs int) {
-	s := m.Scores[0]
-	m.Scores = append(m.Scores, s.AddPoints(hs, vs))
-
 }
 
 func NewMatch(l, v Team, time time.Time, where string) *Match {
@@ -59,6 +57,19 @@ func NewMatch(l, v Team, time time.Time, where string) *Match {
 
 	return m
 }
+
+func (m *Match) Add(s Score) {
+	m.Scores = append(m.Scores, s)
+}
+func (m *Match) AddScore(hs, vs int) {
+	s := m.Scores[0]
+	m.Scores = append(m.Scores, s.AddPoints(hs, vs))
+
+}
+func (m *Match) String() string {
+	return fmt.Sprintf("%s %s at %s", m.Scores[len(m.Scores)-1], m.Time, m.Location)
+}
+
 func NewResult(h string, hs int, v string, vs int, when string, where string) *Match {
 
 	time, e := time.Parse("Monday, January 02 2006, 03:04 PM MST", when)
@@ -70,18 +81,14 @@ func NewResult(h string, hs int, v string, vs int, when string, where string) *M
 	m.AddScore(hs, vs)
 	return m
 }
-func (m *Match) String() string {
-	return fmt.Sprintf("%s %s at %s", m.Scores[len(m.Scores)-1], m.Time, m.Location)
-}
-func (s Score) String() string {
-	return fmt.Sprintf("%s %d - %d %s", s.Home.Name, s.HomeScore, s.VisitorScore, s.Visitor.Name)
-}
 
 func main() {
 	log.Println("Serving...")
 	http.HandleFunc("/list", handler)
 	http.ListenAndServe(":6060", nil)
 }
+
+var templates = template.Must(template.ParseFiles("src/templates/list.html"))
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Serving %s to: %s", r.RequestURI, r.RemoteAddr)
@@ -96,11 +103,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := json.Marshal(results)
 
-	t, err := template.ParseFiles("src/templates/list.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	t.Execute(w, template.JS(j))
-
+	// Will parse on each request. Must be declared as a global var instead
+	// var templates = template.Must(template.ParseFiles("src/templates/list.html"))
+	templates.Execute(w, template.JS(j))
 }
