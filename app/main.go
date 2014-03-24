@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -83,12 +84,23 @@ func NewResult(h string, hs int, v string, vs int, when string, where string) *M
 }
 
 func main() {
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(pwd)
+
 	log.Println("Serving...")
 	http.HandleFunc("/list", handler)
+	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../"+r.RequestURI[1:])
+	})
 	http.ListenAndServe(":6060", nil)
 }
 
-var templates = template.Must(template.ParseFiles("src/templates/list.html"))
+//var templates = template.Must(template.ParseFiles("../templates/list.html"))
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Serving %s to: %s", r.RequestURI, r.RemoteAddr)
@@ -104,6 +116,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	j, _ := json.Marshal(results)
 
 	// Will parse on each request. Must be declared as a global var instead
-	// var templates = template.Must(template.ParseFiles("src/templates/list.html"))
+	var templates = template.Must(template.ParseFiles("../templates/list.html"))
 	templates.Execute(w, template.JS(j))
 }
