@@ -12,9 +12,9 @@ Oh, if go is not your thing, you can also [tell us][7] here what do we need to w
 
 Current project directory:
 
-- /app Go source code for the website
-- /static Static resources such as javascript files, css, images, etc.
-- /templates Source template files used by go source code to generate text dinamically
+- /app - Go source code for the website
+- /static - Static resources such as javascript files, css, images, etc.
+- /templates - Source template files used by go source code to generate text dinamically
 
 
 [0]: https://github.com/nxmatch/webapp/wiki/NxMatch
