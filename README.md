@@ -1,5 +1,5 @@
-_"When is the next match?"_
-======
+_When is the next match?_
+---
 
 [That's the question to answer][0], this is the main repository for the NxMatch website that will satisfy that need for information.
 
