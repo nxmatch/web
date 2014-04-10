@@ -35,38 +35,6 @@
 </div>
 
 </body>
-<script language="JavaScript">
-
-        var d = document.getElementById("match-template");
-
-        var xmlhttp = new XMLHttpRequest();
-
-
-        xmlhttp.onreadystatechange = function() {
-            if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
-                var r = JSON.parse(xmlhttp.responseText);
-                console.log(typeof r);
-                var results = document.getElementById("results");
-
-                for ( var i = 0 ; i < r.length ; i++ ) {
-                    var match = r[i];
-                    var score = match.Scores[match.Scores.length-1];
-                    var n = d.cloneNode(true);
-                    n.querySelector(".time").innerHTML      = match.Time;
-                    n.querySelector(".location").innerHTML  = match.Location;
-                    n.querySelector(".home").innerHTML      = score.Home.Name;
-                    n.querySelector(".visitor").innerHTML   = score.Visitor.Name;
-                    n.querySelector(".score").innerHTML     = score.HomeScore + " - " + score.VisitorScore;
-                    results.appendChild(n);
-                }
-            }
-        }
-        xmlhttp.open("GET", "/list", true);
-        xmlhttp.send();
-        //var r = xmlhttp.responseText;//\{\{.\}\}
-
-
-
-</script>
+<script language="JavaScript" src="/static/nxmatch.js"></script>
 </html>
 
