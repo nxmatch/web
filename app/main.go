@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
+	//"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -94,10 +94,14 @@ func main() {
 
 	log.Println("Serving...")
 	http.HandleFunc("/list", handler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../static/list.html")
+	})
+
 	http.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../"+r.RequestURI[1:])
 	})
-	http.ListenAndServe(":6060", nil)
+	log.Fatal(http.ListenAndServe(":6060", nil))
 }
 
 //var templates = template.Must(template.ParseFiles("../templates/list.html"))
@@ -115,7 +119,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	j, _ := json.Marshal(results)
 
-	// Will parse on each request. Must be declared as a global var instead
-	var templates = template.Must(template.ParseFiles("../templates/list.html"))
-	templates.Execute(w, template.JS(j))
+	//// Will parse on each request. Must be declared as a global var instead
+	//var templates = template.Must(template.ParseFiles("../templates/list.html"))
+	//templates.Execute(w, template.JS(j))
+	w.Write([]byte(j))
 }
